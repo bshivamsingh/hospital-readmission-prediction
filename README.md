@@ -98,7 +98,7 @@ streamlit run app/streamlit_app.py
 
 ## Live Demo
 
-🔗 [Streamlit App — Patient Risk Scorer](#https://hospital-readmission-prediction-pro1.streamlit.app) *(deploy to Streamlit Community Cloud and paste URL here)*  
+🔗 [Streamlit App — Patient Risk Scorer](https://hospital-readmission-prediction-pro1.streamlit.app) *(deploy to Streamlit Community Cloud and paste URL here)*  
 📊 [Tableau Dashboard](#) *(publish to Tableau Public and paste URL here)*
 
 ---
