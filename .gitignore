@@ -1,0 +1,9 @@
+venv/
+data/diabetic_data.csv
+data/IDs_mapping.csv
+data/diabetic_first_encounter.csv
+data/diabetic_model_ready.csv
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
