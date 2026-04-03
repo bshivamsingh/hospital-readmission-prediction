@@ -4,6 +4,11 @@
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue) ![SQL](https://img.shields.io/badge/SQL-SQLite-lightgrey) ![Sklearn](https://img.shields.io/badge/scikit--learn-1.3-orange) ![XGBoost](https://img.shields.io/badge/XGBoost-2.0-green) ![Streamlit](https://img.shields.io/badge/Streamlit-deployed-red)
 
+
+![Streamlit](https://img.shields.io/badge/Streamlit-deployed-red)
+
+![App Screenshot](assets/app_screenshot.png)
+
 ---
 
 ## Business Problem
