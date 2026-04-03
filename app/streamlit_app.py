@@ -30,9 +30,8 @@ st.set_page_config(
 # ── Load model artifacts ─────────────────────────────────────
 @st.cache_resource
 def load_artifacts():
-    base = os.path.dirname(os.path.abspath(__file__))
-    model    = joblib.load(os.path.join(base, 'xgb_readmission_model.pkl'))
-    features = joblib.load(os.path.join(base, 'feature_names.pkl'))
+    model    = joblib.load('app/xgb_readmission_model.pkl')
+    features = joblib.load('app/feature_names.pkl')
     return model, features, None
 
 try:
