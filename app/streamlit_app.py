@@ -115,34 +115,73 @@ if not MODEL_LOADED:
     **For demo purposes**, the app will use a mock risk score based on input features.
     """)
 
+import re
+
+# ── Encoding tables that mirror run_modeling.py's pd.get_dummies() exactly ──
+# (see notebooks/03_feature_engineering.ipynb + app/run_modeling.py, step 4)
+ADMISSION_TYPE_ID = {"Emergency": "1", "Urgent": "2", "Elective": "3"}
+DISCHARGE_DISPOSITION_ID = {
+    "Home": "1",
+    "Skilled Nursing Facility": "3",
+    "Home Health Agency": "6",
+    "Left Against Medical Advice": "7",
+    "Other": "18",
+}
+A1C_CATEGORY = {"None": "Unknown", "Norm": "Norm", ">7": ">7", ">8": ">8"}
+MED_MAP = {"No": 0, "Steady": 1, "Up": 2, "Down": 3}
+
+# The other 20 diabetes medication columns the model was trained on.
+# This simplified UI only asks about insulin, so they default to "No" (0) —
+# same fallback run_modeling.py itself uses for missing values.
+OTHER_MED_COLS = [
+    'metformin', 'repaglinide', 'nateglinide', 'chlorpropamide', 'glimepiride',
+    'acetohexamide', 'glipizide', 'glyburide', 'tolbutamide', 'pioglitazone',
+    'rosiglitazone', 'acarbose', 'miglitol', 'troglitazone', 'tolazamide',
+    'glyburide_metformin', 'glipizide_metformin', 'glimepiride_pioglitazone',
+    'metformin_rosiglitazone', 'metformin_pioglitazone',
+]
+
+
+def _dummy_col(col, category):
+    """
+    Reproduce run_modeling.py's column naming exactly:
+    pd.get_dummies() names a column "{col}_{category}", then the script
+    sanitizes every column name with df.columns.str.replace(r"[^A-Za-z0-9_]", "_").
+    """
+    return re.sub(r"[^A-Za-z0-9_]", "_", f"{col}_{category}")
+
+
 def build_feature_vector(age, gender, race, admission_type, discharge_dest,
                           time_in_hospital, num_inpatient, num_emergency,
                           num_outpatient, num_diagnoses, num_medications,
                           num_lab_procs, num_procedures, insulin_status, a1c_result):
     """
-    Build a feature vector that matches the model's expected input.
-    In production, this would perfectly replicate the feature engineering pipeline.
+    Build a feature vector that matches the model's expected input —
+    including the one-hot encoded categorical columns (race, gender, age,
+    admission/discharge codes, medical specialty, lab results) that
+    run_modeling.py creates via pd.get_dummies(). Every dropdown selection
+    is mapped to its real training-time column name so it actually reaches
+    the model, instead of being silently zero-filled.
+
+    Two categorical fields aren't collected by this simplified UI at all
+    (medical_specialty, max_glu_serum) and admission_source_id is inferred
+    from admission type — these default to "Unknown"/"not tested", matching
+    the fillna('Unknown') the training pipeline applies to missing values.
+    Only insulin dose is tracked individually among the 21 medication
+    columns; the other 20 default to "No", same as an unprescribed drug.
     """
     age_map = {
         '[10-20)': 15, '[20-30)': 25, '[30-40)': 35, '[40-50)': 45,
         '[50-60)': 55, '[60-70)': 65, '[70-80)': 75, '[80-90)': 85, '[90-100)': 95
     }
 
-    discharge_risk_map = {
-        "Home": "Moderate (home)",
-        "Skilled Nursing Facility": "Lower (SNF/rehab)",
-        "Home Health Agency": "Lower (home health)",
-        "Left Against Medical Advice": "High risk (AMA)",
-        "Other": "Other"
-    }
-
     prior_util = num_inpatient * 3 + num_emergency * 2 + num_outpatient
-    insulin_changed = 1 if insulin_status in ['Up', 'Down'] else 0
-    a1c_abnormal = 1 if a1c_result in ['>7', '>8'] else 0
+    insulin_code = MED_MAP[insulin_status]
+    insulin_changed = 1 if insulin_status in ('Up', 'Down') else 0
+    a1c_abnormal = 1 if a1c_result in ('>7', '>8') else 0
+    a1c_tested = 1 if a1c_result != 'None' else 0
     admitted_er = 1 if admission_type == "Emergency" else 0
 
-    # This is a simplified vector for demo
-    # Full version would match all one-hot columns from notebook 03
     features_dict = {
         'age_numeric': age_map.get(age, 65),
         'time_in_hospital': time_in_hospital,
@@ -154,17 +193,39 @@ def build_feature_vector(age, gender, race, admission_type, discharge_dest,
         'number_inpatient': num_inpatient,
         'number_diagnoses': num_diagnoses,
         'prior_utilization_score': prior_util,
-        'comorbidity_count': min(num_diagnoses, 3),
-        'medication_changes': 1 if insulin_status in ['Up', 'Down'] else 0,
+        'medication_changes': insulin_changed,  # only insulin change is known here
         'insulin_changed': insulin_changed,
-        'num_active_meds': max(1, num_medications // 3),
+        'insulin': insulin_code,
+        'num_active_meds': max(1, num_medications // 3) + (1 if insulin_code > 0 else 0),
         'high_lab_burden': 1 if num_lab_procs > 54 else 0,
         'admitted_from_er': admitted_er,
         'emergency_admission': admitted_er,
         'a1c_abnormal': a1c_abnormal,
-        'a1c_tested': 1 if a1c_result != 'None' else 0,
+        'a1c_tested': a1c_tested,
     }
+    for med in OTHER_MED_COLS:
+        features_dict[med] = 0  # "No" — not collected individually by this UI
+
+    # ── One-hot categorical encodings — must match run_modeling.py exactly ──
+    categorical_selections = {
+        'race': race,
+        'gender': gender,
+        'age': age,
+        'discharge_disposition_id': DISCHARGE_DISPOSITION_ID.get(discharge_dest, "18"),
+        'admission_source_id': "7" if admission_type == "Emergency" else "1",
+        'admission_type_id': ADMISSION_TYPE_ID.get(admission_type, "1"),
+        'medical_specialty': "Unknown",   # not collected by this UI
+        'max_glu_serum': "Unknown",       # not collected by this UI
+        'A1Cresult': A1C_CATEGORY.get(a1c_result, "Unknown"),
+    }
+    for col, category in categorical_selections.items():
+        # If this category was the one pd.get_dummies(drop_first=True) dropped
+        # during training, there's no matching column — that's correct: it's
+        # the reference case, which is represented by all dummies staying 0.
+        features_dict[_dummy_col(col, category)] = 1
+
     return features_dict
+
 
 def mock_risk_score(features_dict):
     """
