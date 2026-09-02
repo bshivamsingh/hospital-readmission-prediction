@@ -25,7 +25,7 @@ This project builds an **end-to-end predictive analytics pipeline** to:
 ## Key Findings
 
 - **Top readmission drivers**: number of inpatient visits in the prior year, discharge disposition (to home vs. SNF), number of diagnoses, and insulin dosage changes
-- **XGBoost model** achieved **AUC-ROC: 0.74** vs. logistic regression baseline of 0.67
+- **XGBoost + SMOTE model** achieves **AUC-ROC: 0.588** on a held-out test set, vs. a logistic regression baseline of **0.575** — modest predictive power, honestly reported (see the correction note under Results Summary below)
 - Patients with **3+ inpatient visits** in the prior year have a **2.8× higher readmission rate**
 - Discharges to **skilled nursing facilities** are readmitted at lower rates than home discharges — counter-intuitive and worth investigating further
 
@@ -112,8 +112,9 @@ streamlit run app/streamlit_app.py
 
 | Model | AUC-ROC | Precision (High Risk) | Recall (High Risk) |
 |---|---|---|---|
-| Logistic Regression (baseline) | 0.67 | 0.41 | 0.55 |
-| XGBoost (tuned) | 0.74 | 0.52 | 0.61 |
-| XGBoost + SMOTE | 0.74 | 0.48 | 0.68 |
+| Logistic Regression (baseline) | 0.575 | — | — |
+| XGBoost + SMOTE (deployed model) | 0.588 | 0.155 | 0.093 |
 
-> **Note**: For clinical use cases, recall matters more than precision — missing a high-risk patient is costlier than a false alarm.
+> **Note**: For clinical use cases, recall matters more than precision — missing a high-risk patient is costlier than a false alarm. At a 0.5 probability threshold this model's recall on the high-risk class is low (0.093); a lower decision threshold would trade precision for recall if this were used operationally.
+>
+> **Correction (September 2026)**: Earlier versions of this README and app reported **AUC-ROC 0.74**. That number was never actually produced by any executed training run — the notebook that claimed it failed on an `ImportError` in its first cell and never got past that point, so every downstream "result" in it was written by hand, not measured. The training pipeline was also missing three engineered features (`diag1_category`, `comorbidity_count`, `discharge_risk_group`) that the feature-engineering notebook builds but the deployed script never used. Both issues are now fixed: `app/run_modeling.py` builds the full feature set and `app/model_metrics.json` is written fresh by every training run and read live by the app, so the numbers above and in the app are the real, reproducible, current results — not a hardcoded claim.

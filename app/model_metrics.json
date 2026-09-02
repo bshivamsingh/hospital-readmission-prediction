@@ -1,0 +1,7 @@
+{
+  "auc_roc": 0.588,
+  "precision_high_risk": 0.155,
+  "recall_high_risk": 0.093,
+  "n_features": 151,
+  "seed": 42
+}
