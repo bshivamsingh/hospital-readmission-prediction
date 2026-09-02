@@ -2,6 +2,99 @@
   "auc_roc": 0.588,
   "precision_high_risk": 0.155,
   "recall_high_risk": 0.093,
+  "alt_threshold": 0.3,
+  "precision_high_risk_alt": 0.127,
+  "recall_high_risk_alt": 0.288,
+  "brier_score": 0.106,
+  "calibration": [
+    {
+      "predicted_mean": 0.056,
+      "observed_rate": 0.054,
+      "n": 2861
+    },
+    {
+      "predicted_mean": 0.104,
+      "observed_rate": 0.074,
+      "n": 2861
+    },
+    {
+      "predicted_mean": 0.156,
+      "observed_rate": 0.087,
+      "n": 2860
+    },
+    {
+      "predicted_mean": 0.235,
+      "observed_rate": 0.098,
+      "n": 2861
+    },
+    {
+      "predicted_mean": 0.439,
+      "observed_rate": 0.127,
+      "n": 2861
+    }
+  ],
+  "top_features": [
+    {
+      "feature": "medical_specialty_Unknown",
+      "label": "Medical specialty: Unknown",
+      "mean_abs_shap": 0.6125,
+      "direction": "Higher \u2192 less risk"
+    },
+    {
+      "feature": "discharge_risk_group_Moderate__home_",
+      "label": "Discharge risk group: Moderate  home ",
+      "mean_abs_shap": 0.5705,
+      "direction": "Higher \u2192 less risk"
+    },
+    {
+      "feature": "medical_specialty_InternalMedicine",
+      "label": "Medical specialty: InternalMedicine",
+      "mean_abs_shap": 0.3576,
+      "direction": "Higher \u2192 less risk"
+    },
+    {
+      "feature": "diag1_category_Other",
+      "label": "Primary diagnosis: Other",
+      "mean_abs_shap": 0.3184,
+      "direction": "Higher \u2192 less risk"
+    },
+    {
+      "feature": "A1Cresult_Unknown",
+      "label": "A1C result: Unknown",
+      "mean_abs_shap": 0.2997,
+      "direction": "Higher \u2192 less risk"
+    },
+    {
+      "feature": "discharge_disposition_id",
+      "label": "Discharge disposition (code)",
+      "mean_abs_shap": 0.292,
+      "direction": "Higher \u2192 less risk"
+    },
+    {
+      "feature": "diag1_category_Respiratory",
+      "label": "Primary diagnosis: Respiratory",
+      "mean_abs_shap": 0.2423,
+      "direction": "Higher \u2192 less risk"
+    },
+    {
+      "feature": "a1c_tested",
+      "label": "A1C tested",
+      "mean_abs_shap": 0.2311,
+      "direction": "Higher \u2192 less risk"
+    },
+    {
+      "feature": "medical_specialty_Cardiology",
+      "label": "Medical specialty: Cardiology",
+      "mean_abs_shap": 0.2122,
+      "direction": "Higher \u2192 less risk"
+    },
+    {
+      "feature": "admission_type_id",
+      "label": "Admission type (code)",
+      "mean_abs_shap": 0.203,
+      "direction": "Higher \u2192 less risk"
+    }
+  ],
   "n_features": 151,
   "seed": 42
 }

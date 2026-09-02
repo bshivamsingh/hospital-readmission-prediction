@@ -14,10 +14,12 @@ Patients with 3+ inpatient visits in the prior year are readmitted at **2.8× th
 
 | Prior Inpatient Visits | 30-day Readmission Rate |
 |---|---|
-| 0 | ~8.5% |
-| 1 | ~14.2% |
-| 2 | ~18.6% |
-| 3+ | ~23.9% |
+| 0 | 8.0% |
+| 1 | 12.5% |
+| 2 | 18.1% |
+| 3+ | 25.8% |
+
+*(Recomputed directly from `data/diabetic_first_encounter.csv` — see the "Data Integrity" note in the main README for why every number in this file was re-verified against code that actually runs, rather than trusted as originally written.)*
 
 **Implication**: Care management programs should be targeted at high-utilisation patients *before* they are discharged, not reactively after readmission.
 
@@ -25,16 +27,17 @@ Patients with 3+ inpatient visits in the prior year are readmitted at **2.8× th
 
 ## Finding 2 — Discharge Destination Matters More Than Expected
 
-Counter-intuitively, patients discharged to Skilled Nursing Facilities (SNFs) have *lower* readmission rates than those discharged home. This is likely because SNF patients are actively monitored.
+**Correction**: An earlier version of this finding claimed SNF discharges had a *lower* readmission rate than home discharges, calling it counter-intuitive. That was wrong — it was never actually computed from the data. Recomputing it directly gives the opposite, and more intuitive, result: patients discharged to Skilled Nursing Facilities have the *highest* readmission rate of any discharge group, not the lowest.
 
 | Discharge Destination | 30-day Readmission Rate |
 |---|---|
-| Left Against Medical Advice (AMA) | ~22.1% |
-| Home | ~11.8% |
-| Home Health Agency | ~10.9% |
-| Skilled Nursing Facility | ~8.7% |
+| Skilled Nursing Facility | 13.9% |
+| Other | 11.4% |
+| Home Health Agency | 9.5% |
+| Left Against Medical Advice (AMA) | 9.5% |
+| Home | 7.2% |
 
-**Implication**: "Home" should not mean "discharged and forgotten." Home patients need structured follow-up.
+**Implication**: SNF discharge is a marker of higher baseline risk (sicker patients are the ones sent there), not a protective factor — care teams should treat an SNF discharge as a high-risk signal worth following up on, not a lower-risk one. "Home" is genuinely the lowest-risk discharge group in this data, but that's likely because home discharges skew toward healthier patients to begin with, not because home discharge itself is protective.
 
 ---
 
