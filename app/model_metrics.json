@@ -42,7 +42,7 @@
     },
     {
       "feature": "discharge_risk_group_Moderate__home_",
-      "label": "Discharge risk group: Moderate  home ",
+      "label": "Discharge risk group: Moderate home",
       "mean_abs_shap": 0.5705,
       "direction": "Higher \u2192 less risk"
     },

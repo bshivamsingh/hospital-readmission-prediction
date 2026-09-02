@@ -19,7 +19,7 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import warnings, os, joblib, json
+import warnings, os, joblib, json, re
 warnings.filterwarnings('ignore')
 
 from sklearn.model_selection import train_test_split
@@ -227,13 +227,19 @@ RAW_LABELS = {
 }
 
 def prettify(feature_name):
+    # Column names were sanitized with re.sub(r"[^A-Za-z0-9_]", "_", ...), so punctuation
+    # like "(" ")" or a space collapses into a run of one or more underscores (e.g. the
+    # category "Moderate (home)" became "Moderate__home_"). A naive .replace('_', ' ')
+    # turned that back into "Moderate  home " (double space, trailing space) instead of
+    # something readable — collapse each run of underscores to a single space and strip
+    # the ends instead.
     for prefix, label in PRETTY_PREFIXES.items():
         if feature_name.startswith(prefix):
-            value = feature_name[len(prefix):].replace('_', ' ')
+            value = re.sub(r'_+', ' ', feature_name[len(prefix):]).strip()
             return f"{label}: {value}"
     if feature_name in RAW_LABELS:
         return RAW_LABELS[feature_name]
-    return feature_name.replace('_', ' ').capitalize()
+    return re.sub(r'_+', ' ', feature_name).strip().capitalize()
 
 rng = np.random.RandomState(SEED)
 sample_idx = rng.choice(X_test.index, size=min(2000, len(X_test)), replace=False)

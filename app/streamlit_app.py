@@ -15,6 +15,7 @@ import pandas as pd
 import numpy as np
 import joblib
 import json
+import textwrap
 import shap
 import matplotlib.pyplot as plt
 import matplotlib
@@ -369,14 +370,20 @@ else:
         else:
             table_md = "*(Run `app/run_modeling.py` to populate this table from the trained model.)*"
 
-        st.markdown(f"""
-        ### Top readmission risk factors
-        Based on SHAP analysis of the currently deployed model (mean |SHAP value| across a held-out sample):
+        # textwrap.dedent on the TEMPLATE (before table_md is substituted in) so every
+        # line ends up at zero leading whitespace once table_md (itself unindented) is
+        # dropped in — mixed indentation between this template's lines and table_md's
+        # own rows was breaking the pipe-table's markdown rendering (it was rendering as
+        # a literal code block instead of a table).
+        markdown_template = textwrap.dedent("""\
+            ### Top readmission risk factors
+            Based on SHAP analysis of the currently deployed model (mean |SHAP value| across a held-out sample):
 
-        {table_md}
+            {table_md}
 
-        ---
-        📁 [View source code on GitHub](https://github.com/bshivamsingh/hospital-readmission-prediction)  
-        📊 Tableau dashboard — not yet published (see `dashboard/README.md` for the build spec)  
-        📓 [Read project notebooks](https://github.com/bshivamsingh/hospital-readmission-prediction/tree/main/notebooks)
-        """)
+            ---
+            📁 [View source code on GitHub](https://github.com/bshivamsingh/hospital-readmission-prediction)  
+            📊 Tableau dashboard — not yet published (see `dashboard/README.md` for the build spec)  
+            📓 [Read project notebooks](https://github.com/bshivamsingh/hospital-readmission-prediction/tree/main/notebooks)
+            """)
+        st.markdown(markdown_template.format(table_md=table_md))
