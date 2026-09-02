@@ -36,7 +36,7 @@ df['high_lab_burden']     = (df['num_lab_procedures'] > df['num_lab_procedures']
 df['admitted_from_er']    = (df['admission_source_id'] == 7).astype(int)
 df['emergency_admission'] = (df['admission_type_id'] == 1).astype(int)
 df['a1c_abnormal']        = df['A1Cresult'].isin(['>7','>8']).astype(int)
-df['a1c_tested']          = (df['A1Cresult'] != 'None').astype(int)
+df['a1c_tested']          = df['A1Cresult'].notna().astype(int)  # raw data uses NaN, not the string 'None', for untested
 
 print("[4/6] Encoding medication and categorical columns...")
 MED_COLS = ['metformin','repaglinide','nateglinide','chlorpropamide','glimepiride',
