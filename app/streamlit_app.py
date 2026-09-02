@@ -37,7 +37,15 @@ def load_artifacts():
     # app returned None for the explainer and never actually built one, so every SHAP
     # waterfall silently failed at prediction time and fell back to an error message.
     # This is what actually makes "Explainability: SHAP TreeExplainer" true.
-    explainer = shap.TreeExplainer(model)
+    #
+    # Building it can fail for reasons outside this app's control (a shap/xgboost version
+    # mismatch broke this exact combination once already — see requirements.txt). That
+    # should degrade the SHAP panel, not take down the whole app, so it's caught here
+    # rather than left to crash load_artifacts() and every page load with it.
+    try:
+        explainer = shap.TreeExplainer(model)
+    except Exception:
+        explainer = None
     return model, features, explainer
 
 @st.cache_data
@@ -53,8 +61,12 @@ def load_metrics():
 try:
     model, FEATURE_NAMES, explainer = load_artifacts()
     MODEL_LOADED = True
-except FileNotFoundError:
+except Exception:
+    # Broadened from FileNotFoundError: any failure loading the model artifacts (missing
+    # file, corrupt pickle, incompatible library version) should degrade to "model not
+    # loaded" rather than crash the entire app with an unhandled exception.
     MODEL_LOADED = False
+    explainer = None
 
 METRICS = load_metrics()
 
@@ -280,7 +292,7 @@ if predict_btn:
     st.divider()
 
     # ── SHAP Explanation (if model loaded) ──
-    if MODEL_LOADED:
+    if MODEL_LOADED and explainer is not None:
         st.subheader("🔬 Model Explanation (SHAP)")
         st.caption("Why did the model predict this risk score?")
         try:
@@ -298,6 +310,8 @@ if predict_btn:
             plt.close()
         except Exception as e:
             st.info(f"SHAP waterfall unavailable: {e}")
+    elif MODEL_LOADED:
+        st.info("ℹ️ Model loaded, but the SHAP explainer failed to initialize (likely a library version mismatch) — risk score above is still real, just without the per-patient explanation.")
     else:
         st.info("ℹ️ Train and save the model (notebook 04) to see SHAP explanations here.")
 

@@ -1,2 +1,9 @@
+# Full local-development set: the deployment requirements above, plus everything needed to
+# retrain the model (app/run_modeling.py), run the notebooks, and run the test suite.
+# NOT installed by Streamlit Community Cloud — that only reads requirements.txt.
 -r requirements.txt
+imbalanced-learn==0.14.2   # SMOTE — used by app/run_modeling.py, not by the deployed app
+seaborn==0.13.2            # used in the EDA notebooks only
+jupyter==1.1.1
+ipykernel==7.3.0
 pytest==9.1.1
