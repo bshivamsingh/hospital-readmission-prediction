@@ -36,23 +36,23 @@ The dashboard has **3 views** (tabs):
 2. `model_predictions.csv` — patient ID, risk score, true label (export from notebook 04)
 3. `shap_summary.csv` — feature name, mean_abs_shap (export from notebook 04)
 
-### Export SHAP summary for Tableau
-Add this to notebook 04:
-```python
-shap_df = pd.DataFrame({
-    'feature': X_sample.columns,
-    'mean_abs_shap': np.abs(shap_values).mean(axis=0)
-}).sort_values('mean_abs_shap', ascending=False).head(15)
-shap_df.to_csv('../data/shap_summary.csv', index=False)
+### Export SHAP summary and predictions for Tableau
+**Already done — these are real, generated files, not something you need to build.**
+`app/run_modeling.py` step 9/9 writes `data/model_predictions.csv` (every held-out test
+patient's true label, predicted probability, and predicted class at the 0.5 threshold)
+and `data/shap_summary.csv` (the top 15 features by mean |SHAP value|) on every run, the
+same way it already writes `app/model_metrics.json` — nothing here is hand-exported once
+and left to drift out of sync with the model.
 
-# Export predictions
-pred_df = pd.DataFrame({
-    'true_label': y_test.values,
-    'predicted_prob': y_prob_xgb,
-    'predicted_class': (y_prob_xgb >= 0.5).astype(int)
-})
-pred_df.to_csv('../data/model_predictions.csv', index=False)
+(This intentionally lives in `run_modeling.py`, not `notebooks/04_modeling_shap.ipynb` —
+see the README's "Data Integrity & Lessons Learned" section for why that notebook isn't
+the trusted source of anything in this project.)
+
+Just run:
+```bash
+python app/run_modeling.py
 ```
+and both CSVs will be sitting in `data/`, ready to connect to in Tableau.
 
 ### Tableau connection steps:
 1. Open Tableau Desktop or Tableau Public (free)

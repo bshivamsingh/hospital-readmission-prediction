@@ -1,0 +1,16 @@
+feature,label,mean_abs_shap
+medical_specialty_Unknown,Medical specialty: Unknown,0.6104
+discharge_risk_group_Moderate__home_,Discharge risk group: Moderate home,0.5555
+medical_specialty_InternalMedicine,Medical specialty: InternalMedicine,0.361
+diag1_category_Other,Primary diagnosis: Other,0.3213
+A1Cresult_Unknown,A1C result: Unknown,0.2959
+discharge_disposition_id,Discharge disposition (code),0.2641
+a1c_tested,A1C tested,0.239
+diag1_category_Respiratory,Primary diagnosis: Respiratory,0.238
+medical_specialty_Cardiology,Medical specialty: Cardiology,0.2146
+medical_specialty_Family_GeneralPractice,Medical specialty: Family GeneralPractice,0.1993
+admission_type_id,Admission type (code),0.1908
+gender_Male,Gender: Male,0.1751
+diag1_category_Digestive,Primary diagnosis: Digestive,0.169
+medical_specialty_Emergency_Trauma,Medical specialty: Emergency Trauma,0.1584
+emergency_admission,Emergency admission,0.1546
