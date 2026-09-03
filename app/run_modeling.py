@@ -98,6 +98,11 @@ df['diag1_category'] = df['diag_1'].apply(icd9_category)
 df['discharge_risk_group'] = df['discharge_disposition_id'].apply(discharge_risk)
 
 print("[3/9] Dropping unused columns...")
+# Keep a copy of encounter_id (aligned by df's original row index) before it's dropped —
+# it's rightly excluded from the model's features (a patient identifier isn't a predictor),
+# but it's the only real join key back to diabetic_first_encounter.csv, and the dashboard
+# export below needs it to relate model_predictions.csv to the raw data correctly.
+encounter_ids = df['encounter_id'].copy()
 DROP = ['encounter_id','patient_nbr','weight','payer_code','readmitted','diag_1','diag_2','diag_3']
 df.drop(columns=[c for c in DROP if c in df.columns], inplace=True)
 
@@ -277,11 +282,14 @@ print("[9/9] Exporting dashboard data files (real numbers for the planned Tablea
 os.makedirs('data', exist_ok=True)
 
 pred_df = pd.DataFrame({
-    'patient_row_id': X_test.index,
+    # The real join key back to diabetic_first_encounter.csv's own encounter_id column —
+    # not a positional row number, which would silently join to the wrong (or no) rows.
+    'encounter_id': encounter_ids.loc[X_test.index].values,
     'true_label': y_test.values,
     'predicted_prob': y_prob,
     'predicted_class': (y_prob >= 0.5).astype(int),
 })
+assert pred_df['encounter_id'].is_unique, "encounter_id should be unique per row in this dataset"
 pred_df.to_csv('data/model_predictions.csv', index=False)
 
 # mean_abs_shap here covers every feature (computed on the same held-out SHAP sample as
