@@ -1,7 +1,7 @@
 # Tableau Dashboard — Hospital Readmission Risk
 
 ## Live Dashboard
-🔗 **[View on Tableau Public](https://public.tableau.com/app/profile/b.shivam.singh/viz/HospitalReadmissionDashboard_17887578908780/View3-ModelResults)**
+🔗 **[View on Tableau Public](https://public.tableau.com/app/profile/b.shivam.singh/viz/HospitalReadmissionDashboard_17888227883740/View1ExecutiveSummary)**
 
 ---
 

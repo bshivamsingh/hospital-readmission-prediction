@@ -383,7 +383,7 @@ else:
 
             ---
             📁 [View source code on GitHub](https://github.com/bshivamsingh/hospital-readmission-prediction)  
-            📊 [View the Tableau dashboard](https://public.tableau.com/app/profile/b.shivam.singh/viz/HospitalReadmissionDashboard_17887578908780/View3-ModelResults)  
+            📊 [View the Tableau dashboard](https://public.tableau.com/app/profile/b.shivam.singh/viz/HospitalReadmissionDashboard_17888227883740/View1ExecutiveSummary)  
             📓 [Read project notebooks](https://github.com/bshivamsingh/hospital-readmission-prediction/tree/main/notebooks)
             """)
         st.markdown(markdown_template.format(table_md=table_md))
